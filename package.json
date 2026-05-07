@@ -1,7 +1,7 @@
 {
   "name": "@a_ng_d/utils-ui-color-palette",
   "private": false,
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.",
   "repository": {
     "type": "git",
@@ -59,6 +59,7 @@
     "@a_ng_d/figmug-utils": "^0.4.0",
     "apca-w3": "^0.1.9",
     "chroma-js": "^2.4.2",
-    "hsluv": "^1.0.1"
+    "hsluv": "^1.0.1",
+    "uid": "^2.0.2"
   }
 }
