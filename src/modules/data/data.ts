@@ -17,11 +17,12 @@ import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
 import Contrast from '@modules/contrast/contrast'
 import Color from '@modules/color/color'
 
+const now = new Date().toISOString()
 const DEFAULT_META: MetaConfiguration = {
   id: uid(),
   dates: {
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
     publishedAt: '',
     openedAt: '',
   },
