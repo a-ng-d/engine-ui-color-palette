@@ -86,13 +86,19 @@ export const partitionTokens = (
 ): {
   bound: Array<SystemDataToken>
   unbound: Array<SystemDataToken>
+  excluded: Array<SystemDataToken>
 } => {
   const bound: Array<SystemDataToken> = []
   const unbound: Array<SystemDataToken> = []
+  const excluded: Array<SystemDataToken> = []
   systemData.tokens.forEach((token) => {
+    if (token.isExcluded) {
+      excluded.push(token)
+      return
+    }
     const resolved = resolveTokenPerTheme(paletteData, token)
     if (resolved.every((r) => r.isUnbound)) unbound.push(token)
     else bound.push(token)
   })
-  return { bound, unbound }
+  return { bound, unbound, excluded }
 }
