@@ -1,3 +1,4 @@
+import { uid } from 'uid'
 import { Hsluv } from 'hsluv'
 import chroma from 'chroma-js'
 import {
@@ -15,6 +16,26 @@ import {
 import { Channel, ChannelWithAlpha, HexModel } from '@tps/color.types'
 import Contrast from '@modules/contrast/contrast'
 import Color from '@modules/color/color'
+
+const now = new Date().toISOString()
+const DEFAULT_META: MetaConfiguration = {
+  id: uid(),
+  dates: {
+    createdAt: now,
+    updatedAt: now,
+    publishedAt: '',
+    openedAt: '',
+  },
+  publicationStatus: {
+    isPublished: false,
+    isShared: false,
+  },
+  creatorIdentity: {
+    creatorFullName: '',
+    creatorAvatar: '',
+    creatorId: '',
+  },
+}
 
 const rgbToCmyk = (r: number, g: number, b: number): ChannelWithAlpha => {
   const r1 = r / 255,
@@ -35,7 +56,7 @@ const rgbToCmyk = (r: number, g: number, b: number): ChannelWithAlpha => {
 export default class Data {
   private base: BaseConfiguration
   private themes: Array<ThemeConfiguration>
-  private meta?: MetaConfiguration
+  private meta: MetaConfiguration
   private paletteData: PaletteData
 
   constructor({
@@ -49,7 +70,7 @@ export default class Data {
   }) {
     this.base = base
     this.themes = themes
-    this.meta = meta
+    this.meta = meta ?? DEFAULT_META
     this.paletteData = {
       name: base.name ?? 'UI Color Palette',
       description: base.description,
