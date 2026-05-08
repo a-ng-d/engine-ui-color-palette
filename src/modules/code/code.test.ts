@@ -4,10 +4,13 @@ import {
   ThemeConfiguration,
   MetaConfiguration,
 } from '@tps/configuration.types'
+import { CodeFile } from '@tps/code.types'
 import Data from '@modules/data/data'
 import Code from './code'
 
-describe('Data', () => {
+const first = (files: Array<CodeFile>): string => files[0].content
+
+describe('Code with primitives', () => {
   const mockBase: BaseConfiguration = {
     name: 'Test Palette',
     description: 'Test Description',
@@ -163,47 +166,47 @@ describe('Data', () => {
     meta: mockMeta,
   }).makePaletteData()
 
-  const code = new Code(data)
+  const code = new Code({ paletteData: data })
 
   it('should generate native tokens with makeNativeTokens', () => {
-    const result = code.makeNativeTokens()
+    const result = first(code.makeNativeTokens())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should generate DTCG tokens with makeDtcgTokens', () => {
-    const resultRgb = code.makeDtcgTokens('RGB')
+    const resultRgb = first(code.makeDtcgTokens('RGB'))
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb.length).toBeGreaterThan(0)
 
-    const resultHsl = code.makeDtcgTokens('HSL')
+    const resultHsl = first(code.makeDtcgTokens('HSL'))
     expect(resultHsl).toBeDefined()
     expect(typeof resultHsl).toBe('string')
   })
 
   it('should generate Style Dictionary tokens with makeStyleDictionaryTokens', () => {
-    const result = code.makeStyleDictionaryV3Tokens()
+    const result = first(code.makeStyleDictionaryV3Tokens())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should generate Universal JSON with makeUniversalJson', () => {
-    const result = code.makeUniversalJson()
+    const result = first(code.makeUniversalJson())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should generate CSS custom properties with makeCSS', () => {
-    const resultRgb = code.makeCssCustomProps('RGB')
+    const resultRgb = first(code.makeCssCustomProps('RGB'))
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb).toContain(':root')
 
-    const resultLch = code.makeCssCustomProps('LCH')
+    const resultLch = first(code.makeCssCustomProps('LCH'))
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
@@ -215,8 +218,10 @@ describe('Data', () => {
       meta: mockMeta,
     }).makePaletteData()
 
-    const codeWithDefaultTheme = new Code(dataWithDefaultThemeOnly)
-    const result = codeWithDefaultTheme.makeCssCustomProps('RGB')
+    const codeWithDefaultTheme = new Code({
+      paletteData: dataWithDefaultThemeOnly,
+    })
+    const result = first(codeWithDefaultTheme.makeCssCustomProps('RGB'))
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -235,8 +240,10 @@ describe('Data', () => {
       meta: mockMeta,
     }).makePaletteData()
 
-    const codeWithCustomThemes = new Code(dataWithMultipleCustomThemes)
-    const result = codeWithCustomThemes.makeCssCustomProps('RGB')
+    const codeWithCustomThemes = new Code({
+      paletteData: dataWithMultipleCustomThemes,
+    })
+    const result = first(codeWithCustomThemes.makeCssCustomProps('RGB'))
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -249,7 +256,7 @@ describe('Data', () => {
   })
 
   it('should generate Tailwind v3 config with makeTailwindConfigV3', () => {
-    const result = code.makeTailwindV3Config()
+    const result = first(code.makeTailwindV3Config())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
@@ -262,8 +269,10 @@ describe('Data', () => {
       meta: mockMeta,
     }).makePaletteData()
 
-    const codeWithDefaultTheme = new Code(dataWithDefaultThemeOnly)
-    const result = codeWithDefaultTheme.makeTailwindV3Config()
+    const codeWithDefaultTheme = new Code({
+      paletteData: dataWithDefaultThemeOnly,
+    })
+    const result = first(codeWithDefaultTheme.makeTailwindV3Config())
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -282,8 +291,10 @@ describe('Data', () => {
       themes: [mockThemes[0], mockThemes[1], mockThemes[2]],
     }).makePaletteData()
 
-    const codeWithCustomThemes = new Code(dataWithMultipleCustomThemes)
-    const result = codeWithCustomThemes.makeTailwindV3Config()
+    const codeWithCustomThemes = new Code({
+      paletteData: dataWithMultipleCustomThemes,
+    })
+    const result = first(codeWithCustomThemes.makeTailwindV3Config())
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -298,7 +309,7 @@ describe('Data', () => {
   })
 
   it('should generate Tailwind v4 config with makeTailwindConfigV4', () => {
-    const result = code.makeTailwindV4Config()
+    const result = first(code.makeTailwindV4Config())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
@@ -311,8 +322,10 @@ describe('Data', () => {
       meta: mockMeta,
     }).makePaletteData()
 
-    const codeWithDefaultTheme = new Code(dataWithDefaultThemeOnly)
-    const result = codeWithDefaultTheme.makeTailwindV4Config()
+    const codeWithDefaultTheme = new Code({
+      paletteData: dataWithDefaultThemeOnly,
+    })
+    const result = first(codeWithDefaultTheme.makeTailwindV4Config())
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -332,8 +345,10 @@ describe('Data', () => {
       meta: mockMeta,
     }).makePaletteData()
 
-    const codeWithCustomThemes = new Code(dataWithMultipleCustomThemes)
-    const result = codeWithCustomThemes.makeTailwindV4Config()
+    const codeWithCustomThemes = new Code({
+      paletteData: dataWithMultipleCustomThemes,
+    })
+    const result = first(codeWithCustomThemes.makeTailwindV4Config())
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
@@ -348,7 +363,7 @@ describe('Data', () => {
   })
 
   it('should generate SwiftUI code with makeSwiftUI', () => {
-    const result = code.makeSwiftUI()
+    const result = first(code.makeSwiftUI())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result).toContain('struct')
@@ -356,51 +371,53 @@ describe('Data', () => {
   })
 
   it('should generate UIKit code with makeUIKit', () => {
-    const result = code.makeUIKit()
+    const result = first(code.makeUIKit())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result).toContain('UIColor')
   })
 
   it('should generate Jetpack Compose code with makeCompose', () => {
-    const result = code.makeCompose()
+    const result = first(code.makeCompose())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result).toContain('Color')
   })
 
   it('should generate resource files with makeResources', () => {
-    const result = code.makeResources()
+    const result = first(code.makeResources())
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
     expect(result.length).toBeGreaterThan(0)
   })
 
   it('should generate SCSS variables with makeScssVariable', () => {
-    const resultRgb = code.makeScssVariables('RGB')
+    const resultRgb = first(code.makeScssVariables('RGB'))
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb).toContain('$')
 
-    const resultLch = code.makeScssVariables('LCH')
+    const resultLch = first(code.makeScssVariables('LCH'))
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
 
   it('should generate Less variables with makeLessVariables', () => {
-    const resultRgb = code.makeLessVariables('RGB')
+    const resultRgb = first(code.makeLessVariables('RGB'))
     expect(resultRgb).toBeDefined()
     expect(typeof resultRgb).toBe('string')
     expect(resultRgb).toContain('@')
 
-    const resultLch = code.makeLessVariables('LCH')
+    const resultLch = first(code.makeLessVariables('LCH'))
     expect(resultLch).toBeDefined()
     expect(resultLch).toContain('lch')
   })
 
   it('should generate CSV data with makeCsv', () => {
-    const result = code.makeCsv()
-    expect(result).toBeDefined()
+    const files = code.makeCsv()
+    expect(Array.isArray(files)).toBe(true)
+    expect(files.length).toBeGreaterThan(0)
+    const result = JSON.parse(files[0].content)
     expect(Array.isArray(result)).toBe(true)
     expect(result.length).toBeGreaterThan(0)
 
@@ -415,5 +432,160 @@ describe('Data', () => {
       expect(typeof firstColor.csv).toBe('string')
       expect(firstColor.csv).toContain('Lightness,Chroma,Hue')
     }
+  })
+
+  describe('Code with systemData', () => {
+    const systemData = {
+      type: 'system' as const,
+      schema: {
+        groups: [
+          {
+            id: 'g1',
+            name: 'Type',
+            members: [
+              { id: 'm_bg', name: 'background' },
+              { id: 'm_txt', name: 'text' },
+            ],
+          },
+          {
+            id: 'g2',
+            name: 'State',
+            members: [
+              { id: 'm_def', name: 'default' },
+              { id: 'm_hov', name: 'hover' },
+            ],
+          },
+        ],
+      },
+      tokens: [
+        {
+          path: ['m_bg', 'm_def'],
+          pathNames: ['background', 'default'],
+          description: 'Main surface',
+          refs: [{ themeId: 'theme1', shadeId: 'theme1:color1:50' }],
+        },
+        {
+          path: ['m_bg', 'm_hov'],
+          pathNames: ['background', 'hover'],
+          refs: [{ themeId: 'theme1', shadeId: 'theme1:color1:100' }],
+        },
+        {
+          path: ['m_txt', 'm_def'],
+          pathNames: ['text', 'default'],
+          refs: [{ themeId: 'theme1', shadeId: null }],
+        },
+      ],
+    }
+
+    const codeWithSystem = new Code({ paletteData: data, systemData })
+
+    it('returns 2 files for CSS (primitives + semantics)', () => {
+      const files = codeWithSystem.makeCssCustomProps('RGB')
+      expect(files).toHaveLength(2)
+      expect(files[0].filename).toBe('primitives.css')
+      expect(files[1].filename).toBe('semantics.css')
+      expect(files[1].content).toContain('--background-default')
+      expect(files[1].content).toContain('var(--test-color-a-50)')
+    })
+
+    it('emits unbound tokens as comments in CSS semantics', () => {
+      const semantics = codeWithSystem.makeCssCustomProps('RGB')[1].content
+      expect(semantics).toContain('Unbound')
+      expect(semantics).toContain('text-default')
+    })
+
+    it('returns 2 files for SCSS', () => {
+      const files = codeWithSystem.makeScssVariables('RGB')
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('background-default')
+    })
+
+    it('returns 2 files for Less', () => {
+      const files = codeWithSystem.makeLessVariables('RGB')
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('background-default')
+    })
+
+    it('returns 2 files for DTCG with alias references', () => {
+      const files = codeWithSystem.makeDtcgTokens('RGB')
+      expect(files).toHaveLength(2)
+      const semantics = JSON.parse(files[1].content)
+      expect(semantics.background.default.$value).toBe('{test-color-a.50}')
+    })
+
+    it('returns 2 files for Style Dictionary v3 with alias references', () => {
+      const files = codeWithSystem.makeStyleDictionaryV3Tokens()
+      expect(files).toHaveLength(2)
+      const semantics = JSON.parse(files[1].content)
+      expect(semantics.semantic.background.default.value).toBe(
+        '{color.test-color-a.50}'
+      )
+    })
+
+    it('returns 2 files for Universal JSON with $ref', () => {
+      const files = codeWithSystem.makeUniversalJson()
+      expect(files).toHaveLength(2)
+      const semantics = JSON.parse(files[1].content)
+      expect(semantics.background.default.$ref).toBe('test-color-a.50')
+    })
+
+    it('returns 1 merged file for Native Tokens', () => {
+      const files = codeWithSystem.makeNativeTokens()
+      expect(files).toHaveLength(1)
+      expect(files[0].filename).toBe('tokens.json')
+      const json = JSON.parse(files[0].content)
+      // The semantic set is merged in
+      expect(JSON.stringify(json)).toContain('{test_color_a.50}')
+    })
+
+    it('returns 2 files for Tailwind v3', () => {
+      const files = codeWithSystem.makeTailwindV3Config()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('module.exports')
+      expect(files[1].content).toContain("primitives['test-color-a']['50']")
+    })
+
+    it('returns 2 files for Tailwind v4', () => {
+      const files = codeWithSystem.makeTailwindV4Config()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('var(--color-test-color-a-50)')
+    })
+
+    it('returns 2 files for Swift UI', () => {
+      const files = codeWithSystem.makeSwiftUI()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('SemanticTokenColor')
+      expect(files[1].content).toContain('backgroundDefault')
+    })
+
+    it('returns 2 files for UIKit', () => {
+      const files = codeWithSystem.makeUIKit()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('SemanticToken')
+      expect(files[1].content).toContain('backgroundDefault')
+    })
+
+    it('returns 2 files for Compose', () => {
+      const files = codeWithSystem.makeCompose()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('val background_default')
+      expect(files[1].content).toContain('test_color_a_50')
+    })
+
+    it('returns 2 files for Android Resources XML', () => {
+      const files = codeWithSystem.makeResources()
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('@color/test_color_a_50')
+    })
+
+    it('returns 2 files for CSV semantics (rows of refs)', () => {
+      const files = codeWithSystem.makeCsv()
+      expect(files).toHaveLength(2)
+      expect(files[1].filename).toBe('semantics.csv')
+      expect(files[1].content).toContain(
+        'path,themeId,colorId,shadeName,shadeId'
+      )
+      expect(files[1].content).toContain('background/default,theme1,color1,50')
+    })
   })
 })

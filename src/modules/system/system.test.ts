@@ -369,7 +369,5 @@ describe('System', () => {
       sys.tokens.find((t) => t.path.join('/') === 'tp_txt/sf_pri/st_def')
     ).toBeUndefined()
 
-    console.log('\n=== SystemData (full output) ===\n')
-    console.log(JSON.stringify(sys, null, 2))
   })
 })

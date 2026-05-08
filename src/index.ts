@@ -59,6 +59,7 @@ export type {
   SystemDataToken,
   SystemDataRef,
 } from '@tps/system.types'
+export type { CodeFile } from '@tps/code.types'
 export type { ColorFormat } from '@tps/model.types'
 
 export { default as Color } from '@modules/color/color'
