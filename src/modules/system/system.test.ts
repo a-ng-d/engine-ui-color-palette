@@ -101,22 +101,25 @@ describe('System', () => {
     ])
   })
 
-  it('applies conditional blacklist exclusions', () => {
+  it('marks tokens as excluded when binding has isExcluded: true', () => {
     const sys = new System({
       paletteData,
       system: {
-        schema: {
-          ...baseSchema,
-          exclusions: [{ when: { g1: ['m_txt'] }, exclude: { g2: ['m_pri'] } }],
-        },
+        schema: baseSchema,
+        bindings: [
+          { path: ['m_txt', 'm_pri', 'm_def'], ref: 'blueId:400', isExcluded: true },
+          { path: ['m_txt', 'm_pri', 'm_hov'], ref: 'blueId:400', isExcluded: true },
+        ],
       },
     }).makeSystemData()
 
-    expect(sys.tokens).toHaveLength(6)
-    const hasTextPrimary = sys.tokens.some(
-      (t) => t.path[0] === 'm_txt' && t.path[1] === 'm_pri'
-    )
-    expect(hasTextPrimary).toBe(false)
+    // All 8 paths still present
+    expect(sys.tokens).toHaveLength(8)
+    const excluded = sys.tokens.filter((t) => t.isExcluded)
+    expect(excluded).toHaveLength(2)
+    excluded.forEach((t) => expect(t.refs.every((r) => r.shadeId === null)).toBe(true))
+    const nonExcluded = sys.tokens.filter((t) => !t.isExcluded)
+    expect(nonExcluded).toHaveLength(6)
   })
 
   it('resolves a global binding into a full ref per theme', () => {
@@ -213,30 +216,29 @@ describe('System', () => {
     ])
   })
 
-  it('silently ignores a binding pointing to an excluded path', () => {
+  it('excluded token is present in tokens but has no refs resolved', () => {
     const sys = new System({
       paletteData,
       system: {
-        schema: {
-          ...baseSchema,
-          exclusions: [{ when: { g1: ['m_txt'] }, exclude: { g2: ['m_pri'] } }],
-        },
+        schema: baseSchema,
         bindings: [
-          { path: ['m_txt', 'm_pri', 'm_def'], ref: 'blueId:400' },
+          { path: ['m_txt', 'm_pri', 'm_def'], ref: 'blueId:400', isExcluded: true },
           { path: ['m_bg', 'm_pri', 'm_def'], ref: 'blueId:400' },
         ],
       },
     }).makeSystemData()
 
-    const invalidToken = sys.tokens.find(
+    const excludedToken = sys.tokens.find(
       (t) => t.path.join('/') === 'm_txt/m_pri/m_def'
-    )
-    expect(invalidToken).toBeUndefined()
+    )!
+    expect(excludedToken.isExcluded).toBe(true)
+    expect(excludedToken.refs.every((r) => r.shadeId === null)).toBe(true)
 
-    const validToken = sys.tokens.find(
+    const boundToken = sys.tokens.find(
       (t) => t.path.join('/') === 'm_bg/m_pri/m_def'
     )!
-    expect(validToken.refs.find((r) => r.themeId === 'lightId')!.shadeId).toBe(
+    expect(boundToken.isExcluded).toBe(false)
+    expect(boundToken.refs.find((r) => r.themeId === 'lightId')!.shadeId).toBe(
       'lightId:blueId:400'
     )
   })
@@ -327,13 +329,13 @@ describe('System', () => {
           ],
         },
       ],
-      exclusions: [
-        {
-          when: { g_type: ['tp_txt', 'tp_ico'] },
-          exclude: { g_surf: ['sf_pri', 'sf_sec', 'sf_brd', 'sf_dgr'] },
-        },
-      ],
     }
+
+    const excludedPaths = ['tp_txt', 'tp_ico'].flatMap((type) =>
+      ['sf_pri', 'sf_sec', 'sf_brd', 'sf_dgr'].flatMap((surf) =>
+        ['st_def', 'st_hov', 'st_prs'].map((state) => [type, surf, state])
+      )
+    )
 
     const sys = new System({
       paletteData,
@@ -355,19 +357,29 @@ describe('System', () => {
             path: ['tp_txt', 'sf_onbrd', 'st_def'],
             ref: 'redId:source',
           },
-          {
-            path: ['tp_txt', 'sf_pri', 'st_def'],
+          // excluded bindings (text/icon × non-on* surfaces)
+          ...excludedPaths.map((path) => ({
+            path,
             ref: 'blueId:400',
-          },
+            isExcluded: true,
+          })),
         ],
       },
     }).makeSystemData()
 
-    expect(sys.tokens).toHaveLength(48)
+    // All 72 paths present
+    expect(sys.tokens).toHaveLength(72)
 
-    expect(
-      sys.tokens.find((t) => t.path.join('/') === 'tp_txt/sf_pri/st_def')
-    ).toBeUndefined()
+    // 24 excluded (2 types × 4 surfaces × 3 states)
+    expect(sys.tokens.filter((t) => t.isExcluded)).toHaveLength(24)
 
+    // tp_txt/sf_pri/st_def is present but excluded
+    const excludedToken = sys.tokens.find(
+      (t) => t.path.join('/') === 'tp_txt/sf_pri/st_def'
+    )!
+    expect(excludedToken.isExcluded).toBe(true)
+
+    console.log('\n=== SystemData (full output) ===\n')
+    console.log(JSON.stringify(sys, null, 2))
   })
 })

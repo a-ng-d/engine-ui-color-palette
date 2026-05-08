@@ -9,14 +9,8 @@ export interface TaxonomyGroup {
   members: Array<TaxonomyGroupMember>
 }
 
-export interface TaxonomyExclusion {
-  when: Record<string, Array<string>>
-  exclude: Record<string, Array<string>>
-}
-
 export interface TaxonomySchema {
   groups: Array<TaxonomyGroup>
-  exclusions?: Array<TaxonomyExclusion>
 }
 
 export interface TaxonomyBinding {
@@ -24,6 +18,7 @@ export interface TaxonomyBinding {
   description?: string
   ref: string
   overrides?: Record<string, string>
+  isExcluded?: boolean
 }
 
 export interface SystemConfiguration {
@@ -40,6 +35,7 @@ export interface SystemDataToken {
   path: Array<string>
   pathNames: Array<string>
   description?: string
+  isExcluded: boolean
   refs: Array<SystemDataRef>
 }
 

@@ -4,8 +4,6 @@ import {
   SystemDataRef,
   SystemDataToken,
   TaxonomyBinding,
-  TaxonomyExclusion,
-  TaxonomyGroup,
   TaxonomySchema,
 } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
@@ -26,8 +24,8 @@ export default class System {
   }
 
   makeSystemData = (): SystemData => {
-    const validPaths = this.computeValidPaths(this.system.schema)
-    const tokens = validPaths.map((path) => this.resolveToken(path))
+    const paths = this.computePaths(this.system.schema)
+    const tokens = paths.map((path) => this.resolveToken(path))
     return {
       schema: this.system.schema,
       tokens,
@@ -35,13 +33,11 @@ export default class System {
     }
   }
 
-  private computeValidPaths = (
-    schema: TaxonomySchema
-  ): Array<Array<string>> => {
+  private computePaths = (schema: TaxonomySchema): Array<Array<string>> => {
     const groups = schema.groups
     if (groups.length === 0) return []
 
-    const allPaths: Array<Array<string>> = groups.reduce<Array<Array<string>>>(
+    return groups.reduce<Array<Array<string>>>(
       (acc, group) => {
         if (acc.length === 0) return group.members.map((m) => [m.id])
         const next: Array<Array<string>> = []
@@ -51,41 +47,6 @@ export default class System {
       },
       []
     )
-
-    const exclusions = schema.exclusions ?? []
-    if (exclusions.length === 0) return allPaths
-
-    return allPaths.filter(
-      (path) => !this.isPathExcluded(path, groups, exclusions)
-    )
-  }
-
-  private isPathExcluded = (
-    path: Array<string>,
-    groups: Array<TaxonomyGroup>,
-    exclusions: Array<TaxonomyExclusion>
-  ): boolean => {
-    const indexOfGroup = (groupId: string) =>
-      groups.findIndex((g) => g.id === groupId)
-
-    for (const rule of exclusions) {
-      const whenKeys = Object.keys(rule.when)
-      const whenMatches = whenKeys.every((groupId) => {
-        const idx = indexOfGroup(groupId)
-        if (idx === -1) return false
-        return rule.when[groupId].includes(path[idx])
-      })
-      if (!whenMatches) continue
-
-      const excludeKeys = Object.keys(rule.exclude)
-      const excludeMatches = excludeKeys.some((groupId) => {
-        const idx = indexOfGroup(groupId)
-        if (idx === -1) return false
-        return rule.exclude[groupId].includes(path[idx])
-      })
-      if (excludeMatches) return true
-    }
-    return false
   }
 
   private resolveToken = (path: Array<string>): SystemDataToken => {
@@ -96,21 +57,17 @@ export default class System {
     })
 
     const binding = this.findBinding(path)
+    const isExcluded = binding?.isExcluded ?? false
+
     const refs: Array<SystemDataRef> = this.paletteData.themes.map((theme) => {
-      if (!binding) return { themeId: theme.id, shadeId: null }
+      if (!binding || isExcluded) return { themeId: theme.id, shadeId: null }
       const themeRef = binding.overrides?.[theme.id] ?? binding.ref
       const parsed = this.parseRef(themeRef)
       if (!parsed) return { themeId: theme.id, shadeId: null }
-      const exists = this.shadeExists(
-        theme.id,
-        parsed.colorId,
-        parsed.shadeName
-      )
+      const exists = this.shadeExists(theme.id, parsed.colorId, parsed.shadeName)
       return {
         themeId: theme.id,
-        shadeId: exists
-          ? `${theme.id}:${parsed.colorId}:${parsed.shadeName}`
-          : null,
+        shadeId: exists ? `${theme.id}:${parsed.colorId}:${parsed.shadeName}` : null,
       }
     })
 
@@ -118,6 +75,7 @@ export default class System {
       path,
       pathNames,
       description: binding?.description,
+      isExcluded,
       refs,
     }
   }
@@ -131,9 +89,7 @@ export default class System {
     )
   }
 
-  private parseRef = (
-    ref: string
-  ): { colorId: string; shadeName: string } | null => {
+  private parseRef = (ref: string): { colorId: string; shadeName: string } | null => {
     const idx = ref.indexOf(':')
     if (idx === -1) return null
     const colorId = ref.slice(0, idx)
@@ -142,11 +98,7 @@ export default class System {
     return { colorId, shadeName }
   }
 
-  private shadeExists = (
-    themeId: string,
-    colorId: string,
-    shadeName: string
-  ): boolean => {
+  private shadeExists = (themeId: string, colorId: string, shadeName: string): boolean => {
     const theme = this.paletteData.themes.find((t) => t.id === themeId)
     if (!theme) return false
     const color = theme.colors.find((c) => c.id === colorId)

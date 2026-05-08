@@ -51,7 +51,6 @@ export type {
 export type {
   TaxonomyGroupMember,
   TaxonomyGroup,
-  TaxonomyExclusion,
   TaxonomySchema,
   TaxonomyBinding,
   SystemConfiguration,
