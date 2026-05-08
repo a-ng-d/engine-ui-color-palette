@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-05-08
+
+### Added
+
+- Token exclusion mechanism: `isExcluded` flag on `TaxonomyBinding` and `SystemDataToken` to skip specific semantic tokens from code generation
+
+## [1.10.0] - 2026-05-08
+
+### Added
+
+- New `System` class for building a color system from a taxonomy schema and palette data
+- Full set of semantic token types: `SystemConfiguration`, `SystemData`, `TaxonomySchema`, `TaxonomyGroup`, `TaxonomyGroupMember`, `TaxonomyBinding`, `SystemDataToken`, `SystemDataRef`
+- Semantic code generation for all supported formats: CSS Custom Properties, SCSS, LESS, DTCG, Tailwind v3, Tailwind v4, SwiftUI, UIKit, Compose, Native, Universal, CSV, Android Resources, and Style Dictionary v3
+- Optional `systemData` parameter on the `Code` class to include semantic layers alongside primitives
+- Default metadata configuration (`DEFAULT_META`) on the `Data` class
+
+### Changed
+
+- Primitive format generators moved to `formats/primitives/` subfolder
+
+## [1.9.0] - 2026-04-19
+
+### Added
+
+- Pre-computed text contrast scores (`textContrast`) on each shade in `PaletteData`, with WCAG (ratio, score) and APCA (Lc, recommendedUsage) values for both light and dark text colors
+
 ## [1.8.2] - 2026-04-02
 
 ### Added

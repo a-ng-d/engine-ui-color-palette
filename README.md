@@ -42,6 +42,13 @@ UI Color Palette is available for:
   - Automatic color relationship calculations
   - Support for all major color harmony types
 
+- **Color System & Semantic Tokens**:
+
+  - Build a semantic color system from a taxonomy schema and palette data
+  - Bind semantic tokens to primitive shades with optional per-theme overrides
+  - Exclude specific tokens from code generation via the `isExcluded` flag
+  - Generate semantic token files for CSS, SCSS, LESS, DTCG, Tailwind v3/v4, SwiftUI, UIKit, Compose, Native, Universal, CSV, Android Resources, and Style Dictionary v3
+
 - **Palette Generation**:
   - Create harmonious color schemes
   - Generate accessible color combinations
@@ -318,6 +325,61 @@ paletteData.themes[0].colors[0].shades.forEach((shade) => {
     console.log(shade.textContrast.apca.dark) // { lc: 85.1, recommendedUsage: 'FLUENT_TEXT' }
   }
 })
+```
+
+### Color System & Semantic Tokens
+
+```typescript
+import { System, Code } from '@a_ng_d/utils-ui-color-palette'
+
+// Define a taxonomy schema (groups of semantic dimensions)
+const system = new System({
+  paletteData,
+  system: {
+    schema: {
+      groups: [
+        {
+          id: 'role',
+          name: 'Role',
+          members: [
+            { id: 'brand', name: 'Brand' },
+            { id: 'neutral', name: 'Neutral' },
+          ],
+        },
+        {
+          id: 'prominence',
+          name: 'Prominence',
+          members: [
+            { id: 'default', name: 'Default' },
+            { id: 'subtle', name: 'Subtle' },
+          ],
+        },
+      ],
+    },
+    bindings: [
+      {
+        path: ['brand', 'default'],
+        description: 'Primary brand color',
+        ref: 'blue:500',
+        overrides: { dark: 'blue:400' }, // per-theme override
+      },
+      {
+        path: ['neutral', 'subtle'],
+        ref: 'gray:200',
+        isExcluded: true, // skip this token in code generation
+      },
+    ],
+  },
+})
+
+// Resolve the system data (tokens + refs)
+const systemData = system.makeSystemData()
+
+// Generate semantic token files alongside primitives
+const code = new Code({ paletteData, systemData })
+const files = code.makeCssFiles()
+// files[0].content includes both --color-blue-500 primitives
+// and --brand-default / --neutral-default semantic custom properties
 ```
 
 ## Testing
