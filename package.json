@@ -56,7 +56,7 @@
     "vitest": "^3.1.4"
   },
   "dependencies": {
-    "@a_ng_d/figmug-utils": "^0.4.0",
+    "@unoff/utils": "^0.8.2",
     "apca-w3": "^0.1.9",
     "chroma-js": "^2.4.2",
     "hsluv": "^1.0.1",
