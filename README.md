@@ -1,7 +1,7 @@
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/a-ng-d/engine-ui-color-palette?color=informational) ![GitHub last commit](https://img.shields.io/github/last-commit/a-ng-d/engine-ui-color-palette?color=informational) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/engine-ui-color-palette/npm.yml?label=npm)
 ![GitHub](https://img.shields.io/github/license/a-ng-d/engine-ui-color-palette?color=informational)
 
-# UI Color Palette Utils
+# UI Color Palette Engine
 
 Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.
 
@@ -57,9 +57,9 @@ UI Color Palette is available for:
 ## Installation
 
 ```bash
-npm install @a_ng_d/engine-ui-color-palette
+npm install @uicp/engine
 # or
-yarn add @a_ng_d/engine-ui-color-palette
+yarn add @uicp/engine
 ```
 
 ## Usage
@@ -71,7 +71,7 @@ import {
   Data,
   DominantColors,
   ColorHarmony,
-} from '@a_ng_d/engine-ui-color-palette'
+} from '@uicp/engine'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -100,7 +100,7 @@ const data = new Data({
 ### Color Manipulation
 
 ```typescript
-import { Color } from '@a_ng_d/engine-ui-color-palette'
+import { Color } from '@uicp/engine'
 
 // Create a color instance
 const color = new Color({
@@ -127,7 +127,7 @@ const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
 ### Contrast Calculations
 
 ```typescript
-import { Contrast } from '@a_ng_d/engine-ui-color-palette'
+import { Contrast } from '@uicp/engine'
 
 // Create a contrast checker instance
 const contrast = new Contrast({
@@ -151,7 +151,7 @@ const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
 ### Dominant Colors Extraction
 
 ```typescript
-import { DominantColors } from '@a_ng_d/engine-ui-color-palette'
+import { DominantColors } from '@uicp/engine'
 
 // Prepare your image data (from canvas, file, etc.)
 const canvas = document.createElement('canvas')
@@ -197,7 +197,7 @@ const options = dominantColors.getOptions()
 For modern web applications that need to extract colors from uploaded image files:
 
 ```typescript
-import { DominantColors } from '@a_ng_d/engine-ui-color-palette'
+import { DominantColors } from '@uicp/engine'
 
 // Handle file upload from user input
 const handleImageUpload = async (event: Event) => {
@@ -240,7 +240,7 @@ const extractColorsAdvanced = async (arrayBuffer: ArrayBuffer) => {
 ### Color Harmony Generation
 
 ```typescript
-import { ColorHarmony } from '@a_ng_d/engine-ui-color-palette'
+import { ColorHarmony } from '@uicp/engine'
 
 // Create a color harmony generator
 const colorHarmony = new ColorHarmony({
@@ -278,7 +278,7 @@ colorHarmony.updateOptions({
 ### Palette Generation
 
 ```typescript
-import { Data } from '@a_ng_d/engine-ui-color-palette'
+import { Data } from '@uicp/engine'
 
 // Configure your palette
 const config = {
@@ -329,7 +329,7 @@ paletteData.themes[0].colors[0].shades.forEach((shade) => {
 ### Color System & Semantic Tokens
 
 ```typescript
-import { System, Code } from '@a_ng_d/engine-ui-color-palette'
+import { System, Code } from '@uicp/engine'
 
 // Define a taxonomy schema (groups of semantic dimensions)
 const system = new System({
