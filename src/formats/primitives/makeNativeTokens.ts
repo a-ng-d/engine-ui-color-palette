@@ -1,10 +1,10 @@
 import chroma from 'chroma-js'
+import { Case } from '@unoff/utils'
 import {
   PaletteData,
   PaletteDataColorItem,
   PaletteDataShadeItem,
 } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
 
 const makeNativeTokens = (paletteData: PaletteData) => {
   const paletteName = paletteData.name

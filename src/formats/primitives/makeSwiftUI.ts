@@ -1,5 +1,5 @@
+import { Case } from '@unoff/utils'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
 
 const makeSwiftUI = (paletteData: PaletteData) => {
   const workingThemes =

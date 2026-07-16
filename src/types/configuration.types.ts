@@ -1,4 +1,4 @@
-import { Easing } from '@a_ng_d/figmug-utils'
+import { Easing } from '@unoff/utils'
 import { ColorFormat } from './model.types'
 import { LibraryData } from './data.types'
 import { HexModel, RgbModel } from './color.types'

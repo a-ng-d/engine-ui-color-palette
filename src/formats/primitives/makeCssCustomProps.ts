@@ -1,7 +1,7 @@
 import chroma from 'chroma-js'
+import { Case } from '@unoff/utils'
 import { PaletteData, PaletteDataShadeItem } from '@tps/data.types'
 import { ColorSpaceConfiguration } from '@tps/configuration.types'
-import { Case } from '@a_ng_d/figmug-utils'
 
 const makeCssCustomProps = (
   paletteData: PaletteData,
