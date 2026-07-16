@@ -1,7 +1,11 @@
 import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { partitionTokens, resolveTokenPerTheme, workingThemes } from './_helpers'
+import {
+  partitionTokens,
+  resolveTokenPerTheme,
+  workingThemes,
+} from './_helpers'
 
 const makeDtcgSemantics = (
   paletteData: PaletteData,

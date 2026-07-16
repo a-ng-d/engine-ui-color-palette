@@ -107,8 +107,16 @@ describe('System', () => {
       system: {
         schema: baseSchema,
         bindings: [
-          { path: ['m_txt', 'm_pri', 'm_def'], ref: 'blueId:400', isExcluded: true },
-          { path: ['m_txt', 'm_pri', 'm_hov'], ref: 'blueId:400', isExcluded: true },
+          {
+            path: ['m_txt', 'm_pri', 'm_def'],
+            ref: 'blueId:400',
+            isExcluded: true,
+          },
+          {
+            path: ['m_txt', 'm_pri', 'm_hov'],
+            ref: 'blueId:400',
+            isExcluded: true,
+          },
         ],
       },
     }).makeSystemData()
@@ -117,7 +125,9 @@ describe('System', () => {
     expect(sys.tokens).toHaveLength(8)
     const excluded = sys.tokens.filter((t) => t.isExcluded)
     expect(excluded).toHaveLength(2)
-    excluded.forEach((t) => expect(t.refs.every((r) => r.shadeId === null)).toBe(true))
+    excluded.forEach((t) =>
+      expect(t.refs.every((r) => r.shadeId === null)).toBe(true)
+    )
     const nonExcluded = sys.tokens.filter((t) => !t.isExcluded)
     expect(nonExcluded).toHaveLength(6)
   })
@@ -222,7 +232,11 @@ describe('System', () => {
       system: {
         schema: baseSchema,
         bindings: [
-          { path: ['m_txt', 'm_pri', 'm_def'], ref: 'blueId:400', isExcluded: true },
+          {
+            path: ['m_txt', 'm_pri', 'm_def'],
+            ref: 'blueId:400',
+            isExcluded: true,
+          },
           { path: ['m_bg', 'm_pri', 'm_def'], ref: 'blueId:400' },
         ],
       },

@@ -1,7 +1,11 @@
 import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { partitionTokens, resolveTokenPerTheme, workingThemes } from './_helpers'
+import {
+  partitionTokens,
+  resolveTokenPerTheme,
+  workingThemes,
+} from './_helpers'
 
 const makeUIKitSemantics = (
   paletteData: PaletteData,
@@ -21,8 +25,13 @@ const makeUIKitSemantics = (
     out.push('')
   }
 
-  const camelToken = (parts: Array<string>) => new Case(parts.join(' ')).doCamelCase()
-  const primitiveRef = (themeName: string | null, colorName: string, shadeName: string) => {
+  const camelToken = (parts: Array<string>) =>
+    new Case(parts.join(' ')).doCamelCase()
+  const primitiveRef = (
+    themeName: string | null,
+    colorName: string,
+    shadeName: string
+  ) => {
     const colorCamel = new Case(colorName).doCamelCase()
     const shadeCamel =
       shadeName === 'source' ? 'Source' : new Case(shadeName).doPascalCase()

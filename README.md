@@ -210,10 +210,9 @@ const handleImageUpload = async (event: Event) => {
   try {
     // Simple usage: extract 5 dominant colors
     const colors = await DominantColors.extract(arrayBuffer, 5)
-    
+
     console.log('Extracted colors:', colors)
     // Each color object contains: { color, hex, percentage, count }
-    
   } catch (error) {
     console.error('Error extracting colors:', error)
   }
@@ -394,15 +393,15 @@ yarn test
 
 Current test coverage results:
 
-| File              | % Stmts | % Branch | % Funcs | % Lines |
-| ----------------- | ------- | -------- | ------- | ------- |
-| **All files**     | **91.61** | **87.27** | **91.59** | **91.61** |
-| code              | 100     | 100      | 100     | 100     |
-| color             | 93.54   | 77.51    | 83.33   | 93.54   |
-| color-harmony     | 100     | 96.66    | 100     | 100     |
-| contrast          | 89      | 93.33    | 100     | 89      |
-| data              | 93.48   | 89.74    | 100     | 93.48   |
-| dominant-colors   | 77.58   | 89.06    | 90.47   | 77.58   |
+| File            | % Stmts   | % Branch  | % Funcs   | % Lines   |
+| --------------- | --------- | --------- | --------- | --------- |
+| **All files**   | **91.61** | **87.27** | **91.59** | **91.61** |
+| code            | 100       | 100       | 100       | 100       |
+| color           | 93.54     | 77.51     | 83.33     | 93.54     |
+| color-harmony   | 100       | 96.66     | 100       | 100       |
+| contrast        | 89        | 93.33     | 100       | 89        |
+| data            | 93.48     | 89.74     | 100       | 93.48     |
+| dominant-colors | 77.58     | 89.06     | 90.47     | 77.58     |
 
 To run coverage tests:
 
