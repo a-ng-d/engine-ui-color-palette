@@ -57,9 +57,9 @@ UI Color Palette is available for:
 ## Installation
 
 ```bash
-npm install @uicp/engine
+npm install @yelbolt/engine-ui-color-palette
 # or
-yarn add @uicp/engine
+yarn add @yelbolt/engine-ui-color-palette
 ```
 
 ## Usage
@@ -71,7 +71,7 @@ import {
   Data,
   DominantColors,
   ColorHarmony,
-} from '@uicp/engine'
+} from '@yelbolt/engine-ui-color-palette'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -100,7 +100,7 @@ const data = new Data({
 ### Color Manipulation
 
 ```typescript
-import { Color } from '@uicp/engine'
+import { Color } from '@yelbolt/engine-ui-color-palette'
 
 // Create a color instance
 const color = new Color({
@@ -127,7 +127,7 @@ const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
 ### Contrast Calculations
 
 ```typescript
-import { Contrast } from '@uicp/engine'
+import { Contrast } from '@yelbolt/engine-ui-color-palette'
 
 // Create a contrast checker instance
 const contrast = new Contrast({
@@ -151,7 +151,7 @@ const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
 ### Dominant Colors Extraction
 
 ```typescript
-import { DominantColors } from '@uicp/engine'
+import { DominantColors } from '@yelbolt/engine-ui-color-palette'
 
 // Prepare your image data (from canvas, file, etc.)
 const canvas = document.createElement('canvas')
@@ -197,7 +197,7 @@ const options = dominantColors.getOptions()
 For modern web applications that need to extract colors from uploaded image files:
 
 ```typescript
-import { DominantColors } from '@uicp/engine'
+import { DominantColors } from '@yelbolt/engine-ui-color-palette'
 
 // Handle file upload from user input
 const handleImageUpload = async (event: Event) => {
@@ -240,7 +240,7 @@ const extractColorsAdvanced = async (arrayBuffer: ArrayBuffer) => {
 ### Color Harmony Generation
 
 ```typescript
-import { ColorHarmony } from '@uicp/engine'
+import { ColorHarmony } from '@yelbolt/engine-ui-color-palette'
 
 // Create a color harmony generator
 const colorHarmony = new ColorHarmony({
@@ -278,7 +278,7 @@ colorHarmony.updateOptions({
 ### Palette Generation
 
 ```typescript
-import { Data } from '@uicp/engine'
+import { Data } from '@yelbolt/engine-ui-color-palette'
 
 // Configure your palette
 const config = {
@@ -329,7 +329,7 @@ paletteData.themes[0].colors[0].shades.forEach((shade) => {
 ### Color System & Semantic Tokens
 
 ```typescript
-import { System, Code } from '@uicp/engine'
+import { System, Code } from '@yelbolt/engine-ui-color-palette'
 
 // Define a taxonomy schema (groups of semantic dimensions)
 const system = new System({

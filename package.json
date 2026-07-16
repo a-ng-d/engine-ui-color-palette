@@ -1,5 +1,5 @@
 {
-  "name": "@uicp/engine",
+  "name": "@yelbolt/engine-ui-color-palette",
   "private": false,
   "version": "1.10.2",
   "description": "Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.",
