@@ -1,6 +1,6 @@
+import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
 import makeNativeTokens from '../primitives/makeNativeTokens'
 import {
   partitionTokens,

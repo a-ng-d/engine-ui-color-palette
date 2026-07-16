@@ -1,7 +1,11 @@
+import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
-import { partitionTokens, resolveTokenPerTheme, workingThemes } from './_helpers'
+import {
+  partitionTokens,
+  resolveTokenPerTheme,
+  workingThemes,
+} from './_helpers'
 
 const makeComposeSemantics = (
   paletteData: PaletteData,
@@ -23,7 +27,11 @@ const makeComposeSemantics = (
 
   const tokenName = (parts: Array<string>) =>
     parts.map((p) => new Case(p).doSnakeCase()).join('_')
-  const primitiveRef = (themeName: string | null, colorName: string, shadeName: string) => {
+  const primitiveRef = (
+    themeName: string | null,
+    colorName: string,
+    shadeName: string
+  ) => {
     const c = new Case(colorName).doSnakeCase()
     const s = shadeName === 'source' ? 'source' : shadeName
     if (themeName) {

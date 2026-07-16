@@ -81,12 +81,7 @@ const rgbToCmyk = (
   ]
 }
 
-const cmykToRgb = (
-  c: number,
-  m: number,
-  y: number,
-  k: number
-): Channel => [
+const cmykToRgb = (c: number, m: number, y: number, k: number): Channel => [
   Math.round(255 * (1 - c) * (1 - k)),
   Math.round(255 * (1 - m) * (1 - k)),
   Math.round(255 * (1 - y) * (1 - k)),
@@ -512,11 +507,7 @@ export default class Color {
   cmyk = (): ColorFormat<typeof this.render> => {
     const hsl = chroma(this.sourceColor).hsl()
     const [r, g, b] = chroma
-      .hsl(
-        this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]),
-        hsl[1],
-        hsl[2]
-      )
+      .hsl(this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]), hsl[1], hsl[2])
       .rgb()
 
     const [c, m, y] = rgbToCmyk(r, g, b)
@@ -544,11 +535,7 @@ export default class Color {
   cmyka = (): ColorFormat<typeof this.render> => {
     const hsl = chroma(this.sourceColor).hsl()
     const [r, g, b] = chroma
-      .hsl(
-        this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]),
-        hsl[1],
-        hsl[2]
-      )
+      .hsl(this.adjustHue(Number.isNaN(hsl[0]) ? 0 : hsl[0]), hsl[1], hsl[2])
       .rgb()
 
     const [c, m, y, k] = rgbToCmyk(r, g, b)

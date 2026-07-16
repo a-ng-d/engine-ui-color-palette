@@ -1,7 +1,11 @@
+import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
-import { partitionTokens, resolveTokenPerTheme, workingThemes } from './_helpers'
+import {
+  partitionTokens,
+  resolveTokenPerTheme,
+  workingThemes,
+} from './_helpers'
 
 const makeTailwindV3Semantics = (
   paletteData: PaletteData,
@@ -14,7 +18,7 @@ const makeTailwindV3Semantics = (
   const customThemes = themes.filter((t) => t.type === 'custom theme')
 
   const out: Array<string> = []
-  out.push("// Semantic token map. Import alongside primitives.js:")
+  out.push('// Semantic token map. Import alongside primitives.js:')
   out.push("//   const primitives = require('./primitives.js')")
   out.push("//   const semantics  = require('./semantics.js')(primitives)")
   out.push('')

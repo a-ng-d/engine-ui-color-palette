@@ -19,7 +19,9 @@ const makeCsvSemantics = (
       }
       const parsed = parseShadeId(ref.shadeId)
       if (!parsed) {
-        rows.push(`${escapeCsv(path)},${escapeCsv(ref.themeId)},,,${escapeCsv(ref.shadeId)}`)
+        rows.push(
+          `${escapeCsv(path)},${escapeCsv(ref.themeId)},,,${escapeCsv(ref.shadeId)}`
+        )
         return
       }
       rows.push(

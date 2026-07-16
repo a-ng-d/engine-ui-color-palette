@@ -1,6 +1,6 @@
 import chroma from 'chroma-js'
+import { Case } from '@unoff/utils'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
 
 const makeTailwindV3Config = (paletteData: PaletteData) => {
   const workingThemes =

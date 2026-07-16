@@ -37,16 +37,13 @@ export default class System {
     const groups = schema.groups
     if (groups.length === 0) return []
 
-    return groups.reduce<Array<Array<string>>>(
-      (acc, group) => {
-        if (acc.length === 0) return group.members.map((m) => [m.id])
-        const next: Array<Array<string>> = []
-        for (const path of acc)
-          for (const member of group.members) next.push([...path, member.id])
-        return next
-      },
-      []
-    )
+    return groups.reduce<Array<Array<string>>>((acc, group) => {
+      if (acc.length === 0) return group.members.map((m) => [m.id])
+      const next: Array<Array<string>> = []
+      for (const path of acc)
+        for (const member of group.members) next.push([...path, member.id])
+      return next
+    }, [])
   }
 
   private resolveToken = (path: Array<string>): SystemDataToken => {
@@ -64,10 +61,16 @@ export default class System {
       const themeRef = binding.overrides?.[theme.id] ?? binding.ref
       const parsed = this.parseRef(themeRef)
       if (!parsed) return { themeId: theme.id, shadeId: null }
-      const exists = this.shadeExists(theme.id, parsed.colorId, parsed.shadeName)
+      const exists = this.shadeExists(
+        theme.id,
+        parsed.colorId,
+        parsed.shadeName
+      )
       return {
         themeId: theme.id,
-        shadeId: exists ? `${theme.id}:${parsed.colorId}:${parsed.shadeName}` : null,
+        shadeId: exists
+          ? `${theme.id}:${parsed.colorId}:${parsed.shadeName}`
+          : null,
       }
     })
 
@@ -89,7 +92,9 @@ export default class System {
     )
   }
 
-  private parseRef = (ref: string): { colorId: string; shadeName: string } | null => {
+  private parseRef = (
+    ref: string
+  ): { colorId: string; shadeName: string } | null => {
     const idx = ref.indexOf(':')
     if (idx === -1) return null
     const colorId = ref.slice(0, idx)
@@ -98,7 +103,11 @@ export default class System {
     return { colorId, shadeName }
   }
 
-  private shadeExists = (themeId: string, colorId: string, shadeName: string): boolean => {
+  private shadeExists = (
+    themeId: string,
+    colorId: string,
+    shadeName: string
+  ): boolean => {
     const theme = this.paletteData.themes.find((t) => t.id === themeId)
     if (!theme) return false
     const color = theme.colors.find((c) => c.id === colorId)

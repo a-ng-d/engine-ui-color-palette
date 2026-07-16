@@ -169,7 +169,16 @@ describe('Color', () => {
     const result = color.setColor()
     expect(result).toBeDefined()
 
-    const methods = ['lch', 'oklch', 'lab', 'oklab', 'hsl', 'hsluv', 'hsv', 'cmyk']
+    const methods = [
+      'lch',
+      'oklch',
+      'lab',
+      'oklab',
+      'hsl',
+      'hsluv',
+      'hsv',
+      'cmyk',
+    ]
     methods.forEach((method) => {
       expect(color[method as keyof Color]).toBeDefined()
     })

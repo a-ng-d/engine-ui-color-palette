@@ -1,7 +1,7 @@
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/a-ng-d/engine-ui-color-palette?color=informational) ![GitHub last commit](https://img.shields.io/github/last-commit/a-ng-d/engine-ui-color-palette?color=informational) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-ng-d/engine-ui-color-palette/npm.yml?label=npm)
 ![GitHub](https://img.shields.io/github/license/a-ng-d/engine-ui-color-palette?color=informational)
 
-# UI Color Palette Utils
+# UI Color Palette Engine
 
 Core utilities library for UI Color Palette - a color management plugin for design tools. This library provides the foundational color manipulation, contrast calculation, and palette generation features used in the plugin.
 
@@ -57,9 +57,9 @@ UI Color Palette is available for:
 ## Installation
 
 ```bash
-npm install @a_ng_d/engine-ui-color-palette
+npm install @yelbolt/engine-ui-color-palette
 # or
-yarn add @a_ng_d/engine-ui-color-palette
+yarn add @yelbolt/engine-ui-color-palette
 ```
 
 ## Usage
@@ -71,7 +71,7 @@ import {
   Data,
   DominantColors,
   ColorHarmony,
-} from '@a_ng_d/engine-ui-color-palette'
+} from '@yelbolt/engine-ui-color-palette'
 
 // Use Color class for color manipulation
 const color = new Color({
@@ -100,7 +100,7 @@ const data = new Data({
 ### Color Manipulation
 
 ```typescript
-import { Color } from '@a_ng_d/engine-ui-color-palette'
+import { Color } from '@yelbolt/engine-ui-color-palette'
 
 // Create a color instance
 const color = new Color({
@@ -127,7 +127,7 @@ const mixedHex = color.mixColorsHex('#FF0000', '#0000FF')
 ### Contrast Calculations
 
 ```typescript
-import { Contrast } from '@a_ng_d/engine-ui-color-palette'
+import { Contrast } from '@yelbolt/engine-ui-color-palette'
 
 // Create a contrast checker instance
 const contrast = new Contrast({
@@ -151,7 +151,7 @@ const lightness = contrast.getLightnessForContrastRatio(4.5) // For WCAG AA
 ### Dominant Colors Extraction
 
 ```typescript
-import { DominantColors } from '@a_ng_d/engine-ui-color-palette'
+import { DominantColors } from '@yelbolt/engine-ui-color-palette'
 
 // Prepare your image data (from canvas, file, etc.)
 const canvas = document.createElement('canvas')
@@ -197,7 +197,7 @@ const options = dominantColors.getOptions()
 For modern web applications that need to extract colors from uploaded image files:
 
 ```typescript
-import { DominantColors } from '@a_ng_d/engine-ui-color-palette'
+import { DominantColors } from '@yelbolt/engine-ui-color-palette'
 
 // Handle file upload from user input
 const handleImageUpload = async (event: Event) => {
@@ -210,10 +210,9 @@ const handleImageUpload = async (event: Event) => {
   try {
     // Simple usage: extract 5 dominant colors
     const colors = await DominantColors.extract(arrayBuffer, 5)
-    
+
     console.log('Extracted colors:', colors)
     // Each color object contains: { color, hex, percentage, count }
-    
   } catch (error) {
     console.error('Error extracting colors:', error)
   }
@@ -241,7 +240,7 @@ const extractColorsAdvanced = async (arrayBuffer: ArrayBuffer) => {
 ### Color Harmony Generation
 
 ```typescript
-import { ColorHarmony } from '@a_ng_d/engine-ui-color-palette'
+import { ColorHarmony } from '@yelbolt/engine-ui-color-palette'
 
 // Create a color harmony generator
 const colorHarmony = new ColorHarmony({
@@ -279,7 +278,7 @@ colorHarmony.updateOptions({
 ### Palette Generation
 
 ```typescript
-import { Data } from '@a_ng_d/engine-ui-color-palette'
+import { Data } from '@yelbolt/engine-ui-color-palette'
 
 // Configure your palette
 const config = {
@@ -330,7 +329,7 @@ paletteData.themes[0].colors[0].shades.forEach((shade) => {
 ### Color System & Semantic Tokens
 
 ```typescript
-import { System, Code } from '@a_ng_d/engine-ui-color-palette'
+import { System, Code } from '@yelbolt/engine-ui-color-palette'
 
 // Define a taxonomy schema (groups of semantic dimensions)
 const system = new System({
@@ -394,15 +393,15 @@ yarn test
 
 Current test coverage results:
 
-| File              | % Stmts | % Branch | % Funcs | % Lines |
-| ----------------- | ------- | -------- | ------- | ------- |
-| **All files**     | **91.61** | **87.27** | **91.59** | **91.61** |
-| code              | 100     | 100      | 100     | 100     |
-| color             | 93.54   | 77.51    | 83.33   | 93.54   |
-| color-harmony     | 100     | 96.66    | 100     | 100     |
-| contrast          | 89      | 93.33    | 100     | 89      |
-| data              | 93.48   | 89.74    | 100     | 93.48   |
-| dominant-colors   | 77.58   | 89.06    | 90.47   | 77.58   |
+| File            | % Stmts   | % Branch  | % Funcs   | % Lines   |
+| --------------- | --------- | --------- | --------- | --------- |
+| **All files**   | **91.61** | **87.27** | **91.59** | **91.61** |
+| code            | 100       | 100       | 100       | 100       |
+| color           | 93.54     | 77.51     | 83.33     | 93.54     |
+| color-harmony   | 100       | 96.66     | 100       | 100       |
+| contrast        | 89        | 93.33     | 100       | 89        |
+| data            | 93.48     | 89.74     | 100       | 93.48     |
+| dominant-colors | 77.58     | 89.06     | 90.47     | 77.58     |
 
 To run coverage tests:
 

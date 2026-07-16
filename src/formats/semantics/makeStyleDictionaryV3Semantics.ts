@@ -1,7 +1,11 @@
+import { Case } from '@unoff/utils'
 import { SystemData } from '@tps/system.types'
 import { PaletteData } from '@tps/data.types'
-import { Case } from '@a_ng_d/figmug-utils'
-import { partitionTokens, resolveTokenPerTheme, workingThemes } from './_helpers'
+import {
+  partitionTokens,
+  resolveTokenPerTheme,
+  workingThemes,
+} from './_helpers'
 
 const makeStyleDictionaryV3Semantics = (
   paletteData: PaletteData,
@@ -61,8 +65,9 @@ const makeStyleDictionaryV3Semantics = (
       const resolved = resolveTokenPerTheme(paletteData, t)
       const r = resolved.find((rr) => rr.themeId === theme.id)
       const def =
-        resolved.find((rr) => rr.themeId === defaultTheme.id && !rr.isUnbound) ??
-        resolved.find((rr) => !rr.isUnbound)
+        resolved.find(
+          (rr) => rr.themeId === defaultTheme.id && !rr.isUnbound
+        ) ?? resolved.find((rr) => !rr.isUnbound)
       if (!r || r.isUnbound || !r.colorName || !r.shadeName) return
       if (def && def.colorName === r.colorName && def.shadeName === r.shadeName)
         return
