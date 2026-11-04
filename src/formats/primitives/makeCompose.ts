@@ -1,6 +1,7 @@
 import chroma from 'chroma-js'
 import { Case } from '@unoff/utils'
 import { PaletteData } from '@tps/data.types'
+import { alphaByte } from '../_shared/colorOutput'
 
 const makeCompose = (paletteData: PaletteData) => {
   const workingThemes =
@@ -28,11 +29,9 @@ const makeCompose = (paletteData: PaletteData) => {
               : new Case(color.name).doSnakeCase()
           }_${shade.name} = Color(${
             shade.isTransparent
-              ? chroma(source?.hex ?? '#000000')
-                  .alpha(shade.alpha ?? 1)
+              ? `0X${alphaByte(shade.alpha)}${chroma(source?.hex ?? '#000000')
                   .hex()
-                  .replace('#', '0xFF')
-                  .toUpperCase()
+                  .replace('#', '')}`.toUpperCase()
               : shade.hex.replace('#', '0xFF').toUpperCase()
           })`
         )

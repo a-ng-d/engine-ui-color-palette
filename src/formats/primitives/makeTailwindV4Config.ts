@@ -1,13 +1,34 @@
 import chroma from 'chroma-js'
 import { Case } from '@unoff/utils'
-import { PaletteData } from '@tps/data.types'
+import { PaletteData, PaletteDataShadeItem } from '@tps/data.types'
+import { ColorSpaceConfiguration } from '@tps/configuration.types'
+import { oklchNotation } from '../_shared/colorOutput'
 
-const makeTailwindV4Config = (paletteData: PaletteData) => {
+const makeTailwindV4Config = (
+  paletteData: PaletteData,
+  colorSpace: ColorSpaceConfiguration = 'HEX'
+) => {
   const workingThemes =
     paletteData.themes.filter((theme) => theme.type === 'custom theme')
       .length === 0
       ? paletteData.themes.filter((theme) => theme.type === 'default theme')
       : paletteData.themes.filter((theme) => theme.type === 'custom theme')
+
+  const valueOf = (
+    shade: PaletteDataShadeItem,
+    source: PaletteDataShadeItem | undefined
+  ) => {
+    if (colorSpace === 'OKLCH')
+      return shade.isTransparent && source
+        ? oklchNotation(source.oklch, shade.alpha ?? 1)
+        : oklchNotation(shade.oklch)
+
+    return shade.isTransparent
+      ? chroma(source?.hex ?? '#000000')
+          .alpha(shade.alpha ?? 1)
+          .hex()
+      : shade.hex
+  }
 
   let cssOutput =
     '@import "tailwindcss";\n\n@theme {\n  --color-*: initial;\n\n'
@@ -23,11 +44,7 @@ const makeTailwindV4Config = (paletteData: PaletteData) => {
         cssOutput += `  /* ${color.name} */\n`
 
         color.shades.sort().forEach((shade) => {
-          const colorValue = shade.isTransparent
-            ? chroma(source?.hex ?? '#000000')
-                .alpha(shade.alpha ?? 1)
-                .hex()
-            : shade.hex
+          const colorValue = valueOf(shade, source)
 
           const shadeName = new Case(shade.name).doKebabCase()
           cssOutput += `  --color-${colorName}-${shadeName}: ${colorValue};\n`
@@ -55,11 +72,7 @@ const makeTailwindV4Config = (paletteData: PaletteData) => {
         cssOutput += `  /* ${theme.name} - ${color.name} */\n`
 
         color.shades.forEach((shade) => {
-          const colorValue = shade.isTransparent
-            ? chroma(source?.hex ?? '#000000')
-                .alpha(shade.alpha ?? 1)
-                .hex()
-            : shade.hex
+          const colorValue = valueOf(shade, source)
 
           const shadeName = new Case(shade.name).doKebabCase()
           cssOutput += `  --color-${themeName}-${colorName}-${shadeName}: ${colorValue};\n`

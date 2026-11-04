@@ -31,7 +31,7 @@ const makeDtcgSemantics = (
   }
 
   const aliasFor = (colorName: string, shadeName: string) =>
-    `{${new Case(colorName).doKebabCase()}.${shadeName}}`
+    `{${colorName}.${shadeName}}`
 
   bound.forEach((t) => {
     const keys = t.pathNames.map((p) => new Case(p).doKebabCase())

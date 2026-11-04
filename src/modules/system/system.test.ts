@@ -411,7 +411,8 @@ describe('System', () => {
       expect(lib).toHaveLength(16)
 
       const row = lib.find(
-        (r) => r.themeId === 'lightId' && r.path.join('/') === 'm_bg/m_pri/m_def'
+        (r) =>
+          r.themeId === 'lightId' && r.path.join('/') === 'm_bg/m_pri/m_def'
       )!
       expect(row.id).toBe('lightId:m_bg>m_pri>m_def')
       expect(row.shadeId).toBe('lightId:blueId:400')
