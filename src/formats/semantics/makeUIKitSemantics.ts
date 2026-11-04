@@ -32,17 +32,15 @@ const makeUIKitSemantics = (
     colorName: string,
     shadeName: string
   ) => {
-    const colorCamel = new Case(colorName).doCamelCase()
-    const shadeCamel =
-      shadeName === 'source' ? 'Source' : new Case(shadeName).doPascalCase()
-    if (themeName) {
-      const themePascal = new Case(themeName).doPascalCase()
-      return `Color.${themePascal}.${colorCamel}${shadeCamel}`
-    }
-    return `Color.${colorCamel}${shadeCamel}`
+    const colorPascal = new Case(colorName).doPascalCase()
+    const shadeSuffix = shadeName === 'source' ? 'Source' : shadeName
+    if (themeName)
+      return `UIColor.Token.${new Case(themeName).doPascalCase()}.${colorPascal}${shadeSuffix}`
+    return `UIColor.Token.${colorPascal}${shadeSuffix}`
   }
 
-  out.push('struct SemanticToken {')
+  out.push('extension UIColor {')
+  out.push('  struct SemanticToken {')
 
   if (customThemes.length === 0) {
     bound.forEach((t) => {
@@ -52,25 +50,26 @@ const makeUIKitSemantics = (
         resolved.find((r) => !r.isUnbound)
       if (!def || !def.colorName || !def.shadeName) return
       out.push(
-        `  static let ${camelToken(t.pathNames)} = ${primitiveRef(null, def.colorName, def.shadeName)}`
+        `    static let ${camelToken(t.pathNames)} = ${primitiveRef(null, def.colorName, def.shadeName)}`
       )
     })
   } else {
     themes.forEach((theme) => {
       const themePascal = new Case(theme.name).doPascalCase()
-      out.push(`  struct ${themePascal} {`)
+      out.push(`    struct ${themePascal} {`)
       bound.forEach((t) => {
         const resolved = resolveTokenPerTheme(paletteData, t)
         const r = resolved.find((rr) => rr.themeId === theme.id)
         if (!r || r.isUnbound || !r.colorName || !r.shadeName) return
         out.push(
-          `    static let ${camelToken(t.pathNames)} = ${primitiveRef(theme.name, r.colorName, r.shadeName)}`
+          `      static let ${camelToken(t.pathNames)} = ${primitiveRef(theme.name, r.colorName, r.shadeName)}`
         )
       })
-      out.push('  }')
+      out.push('    }')
     })
   }
 
+  out.push('  }')
   out.push('}')
 
   return out.join('\n')

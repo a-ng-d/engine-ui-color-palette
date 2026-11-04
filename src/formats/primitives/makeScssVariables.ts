@@ -67,7 +67,7 @@ const makeScssVariables = (
           source.lch[1]
         )} ${Math.floor(source.lch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
       OKLCH: () =>
-        `oklch(${Math.floor(source.oklch[0 * 100])}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
+        `oklch(${Math.floor(source.oklch[0] * 100)}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
     }
 
     return actions[colorSpace ?? 'RGB']?.()

@@ -32,14 +32,10 @@ const makeSwiftUISemantics = (
     colorName: string,
     shadeName: string
   ) => {
-    const colorCamel = new Case(colorName).doCamelCase()
-    const shadeCamel =
-      shadeName === 'source' ? 'Source' : new Case(shadeName).doPascalCase()
-    if (themeName) {
-      const themeCamel = new Case(themeName).doCamelCase()
-      return `Color.Token().${themeCamel}${new Case(colorName).doPascalCase()}${shadeCamel}`
-    }
-    return `Color.Token().${colorCamel}${shadeCamel}`
+    const shadeSuffix = shadeName === 'source' ? 'Source' : shadeName
+    if (themeName)
+      return `Color.Token.${new Case(themeName + ' ' + colorName).doPascalCase()}${shadeSuffix}`
+    return `Color.Token.${new Case(colorName).doPascalCase()}${shadeSuffix}`
   }
 
   out.push('public extension Color {')

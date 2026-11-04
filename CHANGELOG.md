@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Tailwind v4 export, OKLCH**: `Code#makeTailwindV4Config` and `makeTailwindV4Config` take a color space, `'HEX'` (default, unchanged output) or `'OKLCH'`, which writes `--color-<color>-<stop>: oklch(…)` with the same notation as the CSS export, transparency included. The semantics file is unchanged: it references the variables
+
+### Changed
+
+- **BREAKING — UIKit export**: the colors are now `UIColor.Token.<Color><Stop>` (`UIColor.Token.<Mode>.<Color><Stop>` with several color modes) instead of `Color.<Color><Stop>`, inside `extension UIColor { struct Token { … } }`, like `Color.Token` in the SwiftUI export. The `struct Color` it used to declare hid SwiftUI's `Color` in any module that also used SwiftUI. The semantic file follows: `UIColor.SemanticToken.<token>` replaces the top-level `SemanticToken`, and it references `UIColor.Token`
+- **BREAKING — Style Dictionary v3 and Universal semantic files with several color modes**: there is now one block per color mode, with aliases that include the mode (`{color.Brand.Light.600}`, `Light.Brand.600`), as the primitives file is keyed. The base `semantic` block of the Style Dictionary v3 file is gone in that case: it pointed to the default mode, which is not exported when custom modes exist. The single-mode output is unchanged
+
+### Fixed
+
+- **DTCG, Style Dictionary v3 and Universal semantic files**: aliases now use the color names the primitives file is keyed with (`{Brand.600}`, `{color.Brand.600}`, `Brand.600`), instead of their kebab-case form (`{brand.600}`) which resolved to nothing as soon as a name had a capital letter or a space
+- **SwiftUI and UIKit semantic files**: references now match the names the primitive files declare (`Color.Token.Blue600`, `Color.Blue600`); `Color.Token()` was not valid Swift
+- **UIKit primitives**: every `UIColor` now carries an `alpha:` (`UIColor(red:green:blue:)` does not exist in UIKit)
+- **SwiftUI primitives**: a transparent shade took its blue channel from the shade instead of its source color
+- **Compose primitives**: a transparent shade is written as `0xAARRGGBB`, with 8 digits (it had 10)
+- **Android resources**: a transparent shade is written as `#AARRGGBB`, the order Android reads, instead of `#RRGGBBAA`
+- **CSS and SCSS primitives**: the OKLCH lightness of a transparent shade was read from `oklch[0 * 100]`, which wrote `oklch(0% …)`
+- **CSS primitives, P3**: shades are converted from sRGB to Display P3 before they are written in `color(display-p3 …)`; the sRGB values were written as they were, which draws a more saturated color on a P3 screen
+
 ## [1.12.1] - 2026-08-17
 
 ### Added

@@ -33,8 +33,12 @@ const makeUniversalSemantics = (
     cur[keys[keys.length - 1]] = value
   }
 
-  const refFor = (colorName: string, shadeName: string) => ({
-    $ref: `${new Case(colorName).doKebabCase()}.${shadeName}`,
+  const refFor = (
+    colorName: string,
+    shadeName: string,
+    themeName?: string
+  ) => ({
+    $ref: `${themeName !== undefined ? `${themeName}.` : ''}${colorName}.${shadeName}`,
   })
 
   if (customThemes.length === 0) {
@@ -54,7 +58,11 @@ const makeUniversalSemantics = (
         const resolved = resolveTokenPerTheme(paletteData, t)
         const r = resolved.find((rr) => rr.themeId === theme.id)
         if (!r || r.isUnbound || !r.colorName || !r.shadeName) return
-        setNested(themeBlock, keys, refFor(r.colorName, r.shadeName))
+        setNested(
+          themeBlock,
+          keys,
+          refFor(r.colorName, r.shadeName, theme.name)
+        )
       })
       root[themeKey] = themeBlock
     })

@@ -31,7 +31,7 @@ const makeUIKit = (paletteData: PaletteData) => {
                 3
               )}, green: ${shade.gl[1].toFixed(3)}, blue: ${shade.gl[2].toFixed(
                 3
-              )})`
+              )}, alpha: 1)`
         )
       })
       UIColors.push('')
@@ -46,7 +46,12 @@ const makeUIKit = (paletteData: PaletteData) => {
     else swift.push(`${UIColors.join('\n  ')}`)
   })
 
-  return `import UIKit\n\nstruct Color {\n  ${swift.join('\n\n  ')}\n}`
+  const body = `  ${swift.join('\n\n  ')}`
+    .split('\n')
+    .map((line) => (line.trim() === '' ? '' : `  ${line}`))
+    .join('\n')
+
+  return `import UIKit\n\nextension UIColor {\n  struct Token {\n${body}\n  }\n}`
 }
 
 export default makeUIKit

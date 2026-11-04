@@ -1,6 +1,7 @@
 import chroma from 'chroma-js'
 import { Case } from '@unoff/utils'
 import { PaletteData } from '@tps/data.types'
+import { alphaByte } from '../_shared/colorOutput'
 
 const makeResources = (paletteData: PaletteData) => {
   const workingThemes =
@@ -30,9 +31,9 @@ const makeResources = (paletteData: PaletteData) => {
               : new Case(color.name).doSnakeCase()
           }_${shade.name}">${
             shade.isTransparent
-              ? chroma(source?.hex ?? '#000000')
-                  .alpha(shade.alpha ?? 1)
+              ? `#${alphaByte(shade.alpha)}${chroma(source?.hex ?? '#000000')
                   .hex()
+                  .replace('#', '')}`
               : shade.hex
           }</color>`
         )

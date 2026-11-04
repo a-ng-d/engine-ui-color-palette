@@ -2,6 +2,7 @@ import chroma from 'chroma-js'
 import { Case } from '@unoff/utils'
 import { PaletteData, PaletteDataShadeItem } from '@tps/data.types'
 import { ColorSpaceConfiguration } from '@tps/configuration.types'
+import { srgbToDisplayP3 } from '../_shared/colorOutput'
 
 const makeCssCustomProps = (
   paletteData: PaletteData,
@@ -35,10 +36,11 @@ const makeCssCustomProps = (
         )} ${Math.floor(shade.lch[2])})`,
       OKLCH: () =>
         `oklch(${Math.floor(shade.oklch[0] * 100)}% ${shade.oklch[1].toFixed(3)} ${Math.floor(shade.oklch[2])})`,
-      P3: () =>
-        `color(display-p3 ${shade.gl[0].toFixed(3)} ${shade.gl[1].toFixed(
-          3
-        )} ${shade.gl[2].toFixed(3)})`,
+      P3: () => {
+        const [r, g, b] = srgbToDisplayP3(shade.gl)
+
+        return `color(display-p3 ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)})`
+      },
     }
 
     return actions[colorSpace ?? 'RGB']?.()
@@ -70,11 +72,12 @@ const makeCssCustomProps = (
           source.lch[1]
         )} ${Math.floor(source.lch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
       OKLCH: () =>
-        `oklch(${Math.floor(source.oklch[0 * 100])}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
-      P3: () =>
-        `color(display-p3 ${source.gl[0].toFixed(3)} ${source.gl[1].toFixed(
-          3
-        )} ${source.gl[2].toFixed(3)} / ${shade.alpha?.toFixed(2) ?? 1})`,
+        `oklch(${Math.floor(source.oklch[0] * 100)}% ${source.oklch[1].toFixed(3)} ${Math.floor(source.oklch[2])} / ${shade.alpha?.toFixed(2) ?? 1})`,
+      P3: () => {
+        const [r, g, b] = srgbToDisplayP3(source.gl)
+
+        return `color(display-p3 ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)} / ${shade.alpha?.toFixed(2) ?? 1})`
+      },
     }
 
     return actions[colorSpace ?? 'RGB']?.()

@@ -30,7 +30,7 @@ const makeSwiftUI = (paletteData: PaletteData) => {
                 shade.name === 'source' ? 'Source' : shade.name
               } = Color(red: ${source?.gl[0].toFixed(
                 3
-              )}, green: ${source?.gl[1].toFixed(3)}, blue: ${shade.gl[2].toFixed(
+              )}, green: ${source?.gl[1].toFixed(3)}, blue: ${source?.gl[2].toFixed(
                 3
               )}).opacity(${shade.alpha ?? 1})`
             : `public let ${

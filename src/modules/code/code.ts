@@ -118,10 +118,12 @@ export default class Code {
         : null
     )
 
-  makeTailwindV4Config = (): Array<CodeFile> =>
+  makeTailwindV4Config = (
+    colorSpace: ColorSpaceConfiguration = 'HEX'
+  ): Array<CodeFile> =>
     this.wrap(
       'primitives.css',
-      makeTailwindV4Config(this.paletteData),
+      makeTailwindV4Config(this.paletteData, colorSpace),
       'text/css',
       'semantics.css',
       this.systemData

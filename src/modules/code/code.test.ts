@@ -6,9 +6,28 @@ import {
 } from '@tps/configuration.types'
 import { CodeFile } from '@tps/code.types'
 import Data from '@modules/data/data'
+import { srgbToDisplayP3 } from '../../formats/_shared/colorOutput'
 import Code from './code'
 
 const first = (files: Array<CodeFile>): string => files[0].content
+
+type Node = { [key: string]: unknown }
+
+const leaves = (node: unknown, key: string): Array<string> =>
+  node && typeof node === 'object'
+    ? Object.entries(node as Node).flatMap(([k, v]) =>
+        k === key && typeof v === 'string' ? [v] : leaves(v, key)
+      )
+    : []
+
+const lookup = (doc: unknown, path: string) =>
+  path
+    .split('.')
+    .reduce<unknown>(
+      (node, segment) =>
+        node && typeof node === 'object' ? (node as Node)[segment] : undefined,
+      doc
+    )
 
 describe('Code with primitives', () => {
   const mockBase: BaseConfiguration = {
@@ -531,7 +550,7 @@ describe('Code with primitives', () => {
       const files = codeWithSystem.makeDtcgTokens('RGB')
       expect(files).toHaveLength(2)
       const semantics = JSON.parse(files[1].content)
-      expect(semantics.background.default.$value).toBe('{test-color-a.50}')
+      expect(semantics.background.default.$value).toBe('{Test Color A.50}')
     })
 
     it('returns 2 files for Style Dictionary v3 with alias references', () => {
@@ -539,7 +558,7 @@ describe('Code with primitives', () => {
       expect(files).toHaveLength(2)
       const semantics = JSON.parse(files[1].content)
       expect(semantics.semantic.background.default.value).toBe(
-        '{color.test-color-a.50}'
+        '{color.Test Color A.50}'
       )
     })
 
@@ -547,7 +566,7 @@ describe('Code with primitives', () => {
       const files = codeWithSystem.makeUniversalJson()
       expect(files).toHaveLength(2)
       const semantics = JSON.parse(files[1].content)
-      expect(semantics.background.default.$ref).toBe('test-color-a.50')
+      expect(semantics.background.default.$ref).toBe('Test Color A.50')
     })
 
     it('returns 1 merged file for Native Tokens', () => {
@@ -570,6 +589,13 @@ describe('Code with primitives', () => {
       const files = codeWithSystem.makeTailwindV4Config()
       expect(files).toHaveLength(2)
       expect(files[1].content).toContain('var(--color-test-color-a-50)')
+    })
+
+    it('keeps the Tailwind v4 semantics on variable references in OKLCH', () => {
+      const files = codeWithSystem.makeTailwindV4Config('OKLCH')
+      expect(files).toHaveLength(2)
+      expect(files[1].content).toContain('var(--color-test-color-a-50)')
+      expect(files[1].content).not.toContain('oklch(')
     })
 
     it('returns 2 files for Swift UI', () => {
@@ -607,6 +633,167 @@ describe('Code with primitives', () => {
         'path,themeId,colorId,shadeName,shadeId'
       )
       expect(files[1].content).toContain('background/default,theme1,color1,50')
+    })
+
+    describe('Aliases resolve against the primitives', () => {
+      it('resolves every DTCG alias in the primitives file', () => {
+        const [primitives, semantics] = codeWithSystem.makeDtcgTokens('RGB')
+        const aliases = leaves(JSON.parse(semantics.content), '$value')
+
+        expect(aliases.length).toBeGreaterThan(0)
+        aliases.forEach((alias) => {
+          expect(
+            lookup(JSON.parse(primitives.content), alias.slice(1, -1))
+          ).toBeDefined()
+        })
+      })
+
+      it('resolves every Style Dictionary v3 alias in the primitives file', () => {
+        const [primitives, semantics] =
+          codeWithSystem.makeStyleDictionaryV3Tokens()
+        const aliases = leaves(JSON.parse(semantics.content), 'value')
+
+        expect(aliases.length).toBeGreaterThan(0)
+        aliases.forEach((alias) => {
+          expect(
+            lookup(JSON.parse(primitives.content), alias.slice(1, -1))
+          ).toBeDefined()
+        })
+      })
+
+      it('resolves every Universal JSON reference in the primitives file', () => {
+        const [primitives, semantics] = codeWithSystem.makeUniversalJson()
+        const refs = leaves(JSON.parse(semantics.content), '$ref')
+
+        expect(refs.length).toBeGreaterThan(0)
+        refs.forEach((ref) => {
+          expect(lookup(JSON.parse(primitives.content), ref)).toBeDefined()
+        })
+      })
+
+      it('references SwiftUI primitives that the primitives file declares', () => {
+        const [primitives, semantics] = codeWithSystem.makeSwiftUI()
+        const refs = [...semantics.content.matchAll(/= Color\.Token\.(\w+)/g)]
+
+        expect(refs.length).toBeGreaterThan(0)
+        expect(semantics.content).not.toContain('Token()')
+        refs.forEach(([, name]) => {
+          expect(primitives.content).toContain(`public let ${name} =`)
+        })
+      })
+
+      it('references UIKit primitives that the primitives file declares', () => {
+        const [primitives, semantics] = codeWithSystem.makeUIKit()
+        const refs = [...semantics.content.matchAll(/= UIColor\.Token\.(\w+)/g)]
+
+        expect(refs.length).toBeGreaterThan(0)
+        refs.forEach(([, name]) => {
+          expect(primitives.content).toContain(`static let ${name} =`)
+        })
+      })
+
+      it('does not declare a top-level Color type in the UIKit files', () => {
+        const [primitives, semantics] = codeWithSystem.makeUIKit()
+
+        expect(primitives.content).toContain('extension UIColor {')
+        expect(primitives.content).toContain('struct Token {')
+        expect(semantics.content).toContain('extension UIColor {')
+        ;[primitives, semantics].forEach((file) => {
+          expect(file.content).not.toMatch(/^struct (Color|SemanticToken)/m)
+        })
+      })
+    })
+  })
+
+  describe('Notation of transparent and wide-gamut colors', () => {
+    const linesOf = (content: string, name: string) =>
+      content.split('\n').filter((line) => line.includes(name))
+
+    it('writes the OKLCH lightness of transparent shades in CSS and SCSS', () => {
+      const cases: Array<[string, string]> = [
+        [first(code.makeCssCustomProps('OKLCH')), '--test-color-c-'],
+        [first(code.makeScssVariables('OKLCH')), '$test-color-c-'],
+      ]
+
+      cases.forEach(([content, name]) => {
+        const transparent = linesOf(content, name).filter((line) =>
+          line.includes(' / ')
+        )
+
+        expect(transparent.length).toBeGreaterThan(0)
+        transparent.forEach((line) => {
+          const lightness = Number(/oklch\((\d+)%/.exec(line)?.[1])
+
+          expect(lightness).toBeGreaterThan(40)
+          expect(lightness).toBeLessThan(50)
+        })
+      })
+    })
+
+    it('converts sRGB to Display P3 instead of reusing the sRGB values', () => {
+      const [r, g, b] = srgbToDisplayP3([1, 0, 0])
+
+      expect(r).toBeCloseTo(0.9175, 3)
+      expect(g).toBeCloseTo(0.2003, 3)
+      expect(b).toBeCloseTo(0.1386, 3)
+      srgbToDisplayP3([1, 1, 1]).forEach((channel) => {
+        expect(channel).toBeCloseTo(1, 5)
+      })
+      expect(srgbToDisplayP3([0, 0, 0])).toEqual([0, 0, 0])
+
+      const source = linesOf(
+        first(code.makeCssCustomProps('P3')),
+        '--test-color-a-source'
+      )[0]
+      const [pr, pg, pb] = [...source.matchAll(/(\d\.\d{3})/g)].map(([value]) =>
+        Number(value)
+      )
+
+      expect(pr).toBeCloseTo(r, 3)
+      expect(pg).toBeCloseTo(g, 3)
+      expect(pb).toBeCloseTo(b, 3)
+    })
+
+    it('gives every UIKit color an alpha, as UIColor requires', () => {
+      const result = first(code.makeUIKit())
+      const initializers = result.match(/UIColor\([^)]*\)/g) ?? []
+
+      expect(initializers.length).toBeGreaterThan(0)
+      initializers.forEach((initializer) => {
+        expect(initializer).toContain('alpha:')
+      })
+    })
+
+    it('keeps the blue channel of the source color for transparent SwiftUI shades', () => {
+      const transparent = linesOf(first(code.makeSwiftUI()), '.opacity(')
+
+      expect(transparent.length).toBeGreaterThan(0)
+      transparent.forEach((line) => {
+        expect(line).toContain('red: 0.000, green: 0.000, blue: 1.000')
+      })
+    })
+
+    it('writes transparent Compose colors as 0xAARRGGBB', () => {
+      const lines = linesOf(first(code.makeCompose()), 'test_color_c_')
+      const transparent = lines.filter((line) => !line.includes('0XFF'))
+
+      expect(transparent.length).toBeGreaterThan(0)
+      lines.forEach((line) => {
+        expect(line).toMatch(/Color\(0X[0-9A-F]{8}\)/)
+      })
+      transparent.forEach((line) => {
+        expect(line).toMatch(/Color\(0X[0-9A-F]{2}0000FF\)/)
+      })
+    })
+
+    it('writes transparent Android colors as #AARRGGBB', () => {
+      const lines = linesOf(first(code.makeResources()), 'test_color_c_')
+      const transparent = lines.filter((line) => /#[0-9a-f]{8}</.test(line))
+
+      expect(transparent.length).toBeGreaterThan(0)
+      transparent.forEach((line) => {
+        expect(line).toMatch(/#[0-9a-f]{2}0000ff</)
+      })
     })
   })
 
@@ -700,10 +887,10 @@ describe('Code with primitives', () => {
       ])
 
       const semanticsA = JSON.parse(files[1].content)
-      expect(semanticsA.background.$value).toBe('{test-color-a.50}')
+      expect(semanticsA.background.$value).toBe('{Test Color A.50}')
 
       const semanticsB = JSON.parse(files[3].content)
-      expect(semanticsB.background.$value).toBe('{test-color-b.100}')
+      expect(semanticsB.background.$value).toBe('{Test Color B.100}')
 
       const resolver = JSON.parse(files[4].content)
 
@@ -728,6 +915,159 @@ describe('Code with primitives', () => {
       const files = codeWithDefaultTheme.makeDtcgTokens('RGB')
 
       expect(files.map((f) => f.filename)).toEqual(['primitives.tokens.json'])
+    })
+  })
+
+  describe('Tailwind v4 color space', () => {
+    const variables = (content: string, name: string) =>
+      new Map(
+        content
+          .split('\n')
+          .filter((line) => line.trim().startsWith(`--${name}`))
+          .map((line) => {
+            const [key, value] = line.trim().split(/: (.*);$/)
+
+            return [key, value] as [string, string]
+          })
+      )
+
+    it('writes hex values by default', () => {
+      const result = first(code.makeTailwindV4Config())
+      const red = variables(result, 'color-test-color-a-')
+
+      expect(red.size).toBeGreaterThan(0)
+      red.forEach((value) => expect(value).toMatch(/^#[0-9a-f]{6}$/))
+    })
+
+    it('writes oklch() values when asked, for every shade', () => {
+      const result = first(code.makeTailwindV4Config('OKLCH'))
+      const red = variables(result, 'color-test-color-a-')
+
+      expect(result).toContain('@import "tailwindcss";')
+      expect(result).toContain('--color-*: initial;')
+      expect(red.size).toBeGreaterThan(0)
+      red.forEach((value) =>
+        expect(value).toMatch(/^oklch\(\d+% \d\.\d{3} \d+\)$/)
+      )
+    })
+
+    it('writes the same oklch() values as the CSS export', () => {
+      const tailwind = variables(
+        first(code.makeTailwindV4Config('OKLCH')),
+        'color-test-color-a-'
+      )
+      const css = variables(
+        first(code.makeCssCustomProps('OKLCH')),
+        'test-color-a-'
+      )
+
+      expect(tailwind.size).toBe(css.size)
+      tailwind.forEach((value, key) => {
+        expect(css.get(key.replace('--color-', '--'))).toBe(value)
+      })
+    })
+
+    it('keeps the transparency of the shades', () => {
+      const blue = variables(
+        first(code.makeTailwindV4Config('OKLCH')),
+        'color-test-color-c-'
+      )
+      const transparent = [...blue.values()].filter((value) =>
+        value.includes(' / ')
+      )
+
+      expect(transparent.length).toBeGreaterThan(0)
+      transparent.forEach((value) =>
+        expect(value).toMatch(/^oklch\(\d+% \d\.\d{3} \d+ \/ \d\.\d{2}\)$/)
+      )
+    })
+  })
+
+  describe('Aliases with several color modes', () => {
+    const dataWithModes = new Data({
+      base: mockBase,
+      themes: [mockThemes[0], mockThemes[1], mockThemes[2]],
+      meta: mockMeta,
+    }).makePaletteData()
+
+    const modeA = mockThemes[1]
+    const modeB = mockThemes[2]
+    const codeWithModes = new Code({
+      paletteData: dataWithModes,
+      systemData: {
+        type: 'system' as const,
+        schema: {
+          groups: [
+            {
+              id: 'g1',
+              name: 'Type',
+              members: [{ id: 'm_bg', name: 'background' }],
+            },
+          ],
+        },
+        tokens: [
+          {
+            path: ['m_bg'],
+            pathNames: ['background'],
+            isExcluded: false,
+            refs: [
+              { themeId: modeA.id, shadeId: `${modeA.id}:color1:50` },
+              { themeId: modeB.id, shadeId: `${modeB.id}:color2:100` },
+            ],
+          },
+        ],
+      },
+    })
+
+    it('points Style Dictionary v3 aliases at the primitives of their own color mode', () => {
+      const [primitives, semantics] =
+        codeWithModes.makeStyleDictionaryV3Tokens()
+      const doc = JSON.parse(semantics.content)
+      const aliases = leaves(doc, 'value')
+
+      expect(doc.semantic).toBeUndefined()
+      expect(Object.keys(doc).sort()).toEqual([
+        'custom-theme-a',
+        'custom-theme-b',
+      ])
+      expect(doc['custom-theme-a'].background.value).toBe(
+        '{color.Test Color A.Custom Theme A.50}'
+      )
+      expect(doc['custom-theme-b'].background.value).toBe(
+        '{color.Test Color B.Custom Theme B.100}'
+      )
+      aliases.forEach((alias) => {
+        expect(
+          lookup(JSON.parse(primitives.content), alias.slice(1, -1))
+        ).toBeDefined()
+      })
+    })
+
+    it('points Universal JSON references at the primitives of their own color mode', () => {
+      const [primitives, semantics] = codeWithModes.makeUniversalJson()
+      const doc = JSON.parse(semantics.content)
+      const refs = leaves(doc, '$ref')
+
+      expect(refs).toEqual([
+        'Custom Theme A.Test Color A.50',
+        'Custom Theme B.Test Color B.100',
+      ])
+      refs.forEach((ref) => {
+        expect(lookup(JSON.parse(primitives.content), ref)).toBeDefined()
+      })
+    })
+
+    it('points UIKit and SwiftUI references at declared primitives, per color mode', () => {
+      const [uikitPrimitives, uikitSemantics] = codeWithModes.makeUIKit()
+      const uikit = [
+        ...uikitSemantics.content.matchAll(/= UIColor\.Token\.(\w+)\.(\w+)/g),
+      ]
+
+      expect(uikit.length).toBeGreaterThan(0)
+      uikit.forEach(([, mode, name]) => {
+        expect(uikitPrimitives.content).toContain(`struct ${mode} {`)
+        expect(uikitPrimitives.content).toContain(`static let ${name} =`)
+      })
     })
   })
 })

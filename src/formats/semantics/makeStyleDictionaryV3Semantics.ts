@@ -35,48 +35,45 @@ const makeStyleDictionaryV3Semantics = (
     cur[keys[keys.length - 1]] = value
   }
 
-  const aliasFor = (colorName: string, shadeName: string) =>
-    `{color.${new Case(colorName).doKebabCase()}.${shadeName}}`
+  const aliasFor = (colorName: string, shadeName: string, themeName?: string) =>
+    `{color.${colorName}${themeName !== undefined ? `.${themeName}` : ''}.${shadeName}}`
 
-  const semantic: Record<string, unknown> = {}
-  bound.forEach((t) => {
-    const keys = t.pathNames.map((p) => new Case(p).doKebabCase())
-    const resolved = resolveTokenPerTheme(paletteData, t)
-    const def =
-      resolved.find((r) => r.themeId === defaultTheme.id && !r.isUnbound) ??
-      resolved.find((r) => !r.isUnbound)
-    if (!def || !def.colorName || !def.shadeName) return
-    const tokenObj: Record<string, unknown> = {
-      type: 'color',
-      value: aliasFor(def.colorName, def.shadeName),
-    }
-    if (t.description) tokenObj.comment = t.description
-    setNested(semantic, keys, tokenObj)
-  })
-  root['semantic'] = semantic
-
-  customThemes.forEach((theme) => {
-    const themeKey = new Case(theme.name).doKebabCase()
-    const themeBlock: Record<string, unknown> = {}
+  if (customThemes.length === 0) {
+    const semantic: Record<string, unknown> = {}
     bound.forEach((t) => {
       const keys = t.pathNames.map((p) => new Case(p).doKebabCase())
       const resolved = resolveTokenPerTheme(paletteData, t)
-      const r = resolved.find((rr) => rr.themeId === theme.id)
       const def =
-        resolved.find(
-          (rr) => rr.themeId === defaultTheme.id && !rr.isUnbound
-        ) ?? resolved.find((rr) => !rr.isUnbound)
-      if (!r || r.isUnbound || !r.colorName || !r.shadeName) return
-      if (def && def.colorName === r.colorName && def.shadeName === r.shadeName)
-        return
+        resolved.find((r) => r.themeId === defaultTheme.id && !r.isUnbound) ??
+        resolved.find((r) => !r.isUnbound)
+      if (!def || !def.colorName || !def.shadeName) return
       const tokenObj: Record<string, unknown> = {
         type: 'color',
-        value: aliasFor(r.colorName, r.shadeName),
+        value: aliasFor(def.colorName, def.shadeName),
       }
-      setNested(themeBlock, keys, tokenObj)
+      if (t.description) tokenObj.comment = t.description
+      setNested(semantic, keys, tokenObj)
     })
-    if (Object.keys(themeBlock).length > 0) root[themeKey] = themeBlock
-  })
+    root['semantic'] = semantic
+  } else {
+    customThemes.forEach((theme) => {
+      const themeBlock: Record<string, unknown> = {}
+      bound.forEach((t) => {
+        const keys = t.pathNames.map((p) => new Case(p).doKebabCase())
+        const resolved = resolveTokenPerTheme(paletteData, t)
+        const r = resolved.find((rr) => rr.themeId === theme.id)
+        if (!r || r.isUnbound || !r.colorName || !r.shadeName) return
+        const tokenObj: Record<string, unknown> = {
+          type: 'color',
+          value: aliasFor(r.colorName, r.shadeName, theme.name),
+        }
+        if (t.description) tokenObj.comment = t.description
+        setNested(themeBlock, keys, tokenObj)
+      })
+      if (Object.keys(themeBlock).length > 0)
+        root[new Case(theme.name).doKebabCase()] = themeBlock
+    })
+  }
 
   return JSON.stringify(root, null, 2)
 }
